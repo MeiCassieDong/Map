@@ -15,7 +15,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class MapsActivity extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks,
+                                                       GoogleApiClient.OnConnectionFailedListener,
+                                                       GoogleMap.OnMapClickListener,
+                                                       GoogleMap.OnMapLongClickListener {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private GoogleApiClient mGoogleApiClient;
@@ -47,6 +50,8 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
                 createGoogleApiClient();
+                mMap.setOnMapClickListener(this);
+                mMap.setOnMapLongClickListener(this);
             }
         }
     }
@@ -67,17 +72,29 @@ public class MapsActivity extends FragmentActivity implements GoogleApiClient.Co
                 mGoogleApiClient);
 
         LatLng lastLatlng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-        mMap.addMarker(new MarkerOptions().position(lastLatlng).title("current location"));
+        setMarker(lastLatlng, "Current Location");
         mMap.moveCamera( CameraUpdateFactory.newLatLngZoom(lastLatlng, 14.0f) );
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
+    }
 
+    @Override
+    public void onMapClick(LatLng latLng) {
+        setMarker(latLng, "Alarm");
+    }
+
+    private void setMarker(LatLng latLng, String title) {
+        mMap.addMarker(new MarkerOptions().position(latLng).title(title));
+    }
+
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+        setMarker(latLng, "Alarm");
     }
 }
